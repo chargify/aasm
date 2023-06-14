@@ -42,15 +42,15 @@ module AASM
 
       module ClassMethods
 
-        def find_in_state(number, state, *args)
+        def find_in_state(number, state, *args, **kwargs)
           with_state_scope state do
-            find(number, *args)
+            find(number, *args, **kwargs)
           end
         end
 
-        def count_in_state(state, *args)
+        def count_in_state(state, *args, **kwargs)
           with_state_scope state do
-            count(*args)
+            count(*args, **kwargs)
           end
         end
 

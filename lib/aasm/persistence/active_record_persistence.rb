@@ -46,21 +46,21 @@ module AASM
 
       module ClassMethods
 
-        def find_in_state(number, state, *args)
+        def find_in_state(number, state, *args, **kwargs)
           with_state_scope state do
-            find(number, *args)
+            find(number, *args, **kwargs)
           end
         end
 
-        def count_in_state(state, *args)
+        def count_in_state(state, *args, **kwargs)
           with_state_scope state do
-            count(*args)
+            count(*args, **kwargs)
           end
         end
 
-        def calculate_in_state(state, *args)
+        def calculate_in_state(state, *args, **kwargs)
           with_state_scope state do
-            calculate(*args)
+            calculate(*args, **kwargs)
           end
         end
 
@@ -170,7 +170,7 @@ module AASM
           aasm.enter_initial_state if send(self.class.aasm_column).blank?
         end
 
-        def aasm_fire_event(name, options, *args, &block)
+        def aasm_fire_event(name, options, *args, **kwargs, &block)
           success = options[:persist] ? self.class.transaction(:requires_new => requires_new?) { super } : super
 
           if success && options[:persist]

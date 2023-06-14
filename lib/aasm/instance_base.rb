@@ -74,9 +74,9 @@ module AASM
       end
     end
 
-    def may_fire_event?(name, *args)
+    def may_fire_event?(name, *args, **kwargs)
       if event = @instance.class.aasm.events[name]
-        event.may_fire?(@instance, *args)
+        event.may_fire?(@instance, *args, **kwargs)
       else
         false # unknown event
       end

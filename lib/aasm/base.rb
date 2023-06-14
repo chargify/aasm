@@ -50,18 +50,18 @@ module AASM
       # an addition over standard aasm so that, before firing an event, you can ask
       # may_event? and get back a boolean that tells you whether the guard method
       # on the transition will let this happen.
-      @klass.send(:define_method, "may_#{name.to_s}?") do |*args|
-        aasm.may_fire_event?(name, *args)
+      @klass.send(:define_method, "may_#{name.to_s}?") do |*args, **kwargs|
+        aasm.may_fire_event?(name, *args, **kwargs)
       end
 
-      @klass.send(:define_method, "#{name.to_s}!") do |*args, &block|
+      @klass.send(:define_method, "#{name.to_s}!") do |*args, **kwargs, &block|
         aasm.current_event = "#{name.to_s}!".to_sym
-        aasm_fire_event(name, {:persist => true}, *args, &block)
+        aasm_fire_event(name, {:persist => true}, *args, **kwargs, &block)
       end
 
-      @klass.send(:define_method, "#{name.to_s}") do |*args, &block|
+      @klass.send(:define_method, "#{name.to_s}") do |*args, **kwargs, &block|
         aasm.current_event = name.to_sym
-        aasm_fire_event(name, {:persist => false}, *args, &block)
+        aasm_fire_event(name, {:persist => false}, *args, **kwargs, &block)
       end
     end
 

@@ -85,8 +85,8 @@ module AASM
 
   class Base
     # make sure to create a (named) scope for each state
-    def state_with_scope(name, *args)
-      state_without_scope(name, *args)
+    def state_with_scope(name, *args, **kwargs)
+      state_without_scope(name, *args, **kwargs)
       if AASM::StateMachine[@klass].config.create_scopes && !@klass.respond_to?(name)
         if @klass.ancestors.map {|klass| klass.to_s}.include?("ActiveRecord::Base")
 

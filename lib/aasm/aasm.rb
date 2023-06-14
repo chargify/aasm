@@ -145,7 +145,7 @@ module AASM
 
 private
 
-  def aasm_fire_event(event_name, options, *args, &block)
+  def aasm_fire_event(event_name, options, *args, **kwargs, &block)
     event = self.class.aasm.events[event_name]
     begin
       old_state = aasm.state_object_for_name(aasm.current_state)
@@ -154,7 +154,7 @@ private
       # new event before callback
       event.fire_callbacks(:before, self)
 
-      if new_state_name = event.fire(self, *args)
+      if new_state_name = event.fire(self, *args, **kwargs)
         aasm_fired(event, old_state, new_state_name, options, &block)
       else
         aasm_failed(event_name, old_state)

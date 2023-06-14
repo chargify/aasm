@@ -13,12 +13,12 @@ module AASM
     # a neutered version of fire - it doesn't actually fire the event, it just
     # executes the transition guards to determine if a transition is even
     # an option given current conditions.
-    def may_fire?(obj, to_state=nil, *args)
-      _fire(obj, true, to_state, *args) # true indicates test firing
+    def may_fire?(obj, to_state=nil, *args, **kwargs)
+      _fire(obj, true, to_state, *args, **kwargs) # true indicates test firing
     end
 
-    def fire(obj, to_state=nil, *args)
-      _fire(obj, false, to_state, *args) # false indicates this is not a test (fire!)
+    def fire(obj, to_state=nil, *args, **kwargs)
+      _fire(obj, false, to_state, *args, **kwargs) # false indicates this is not a test (fire!)
     end
 
     def transitions_from_state?(state)
@@ -43,8 +43,8 @@ module AASM
       transitions
     end
 
-    def fire_callbacks(callback_name, record, *args)
-      invoke_callbacks(@options[callback_name], record, args)
+    def fire_callbacks(callback_name, record, *args, **kwargs)
+      invoke_callbacks(@options[callback_name], record, *args, **kwargs)
     end
 
     def ==(event)
@@ -89,7 +89,7 @@ module AASM
     end
 
     # Execute if test == false, otherwise return true/false depending on whether it would fire
-    def _fire(obj, test, to_state=nil, *args)
+    def _fire(obj, test, to_state=nil, *args, **kwargs)
       result = test ? false : nil
       if @transitions.map(&:from).any?
         transitions = @transitions.select { |t| t.from == obj.aasm.current_state }
@@ -100,12 +100,12 @@ module AASM
 
       transitions.each do |transition|
         next if to_state and !Array(transition.to).include?(to_state)
-        if transition.perform(obj, *args)
+        if transition.perform(obj, *args, **kwargs)
           if test
             result = true
           else
             result = to_state || Array(transition.to).first
-            transition.execute(obj, *args)
+            transition.execute(obj, *args, **kwargs)
           end
 
           break
@@ -114,16 +114,16 @@ module AASM
       result
     end
 
-    def invoke_callbacks(code, record, args)
+    def invoke_callbacks(code, record, *args, **kwargs)
       case code
         when Symbol, String
-          record.send(code, *args)
+          record.send(code, *args, **kwargs)
           true
         when Proc
-          record.instance_exec(*args, &code)
+          record.instance_exec(*args, **kwargs, &code)
           true
         when Array
-          code.each {|a| invoke_callbacks(a, record, args)}
+          code.each {|a| invoke_callbacks(a, record, *args, **kwargs)}
           true
         else
           false
